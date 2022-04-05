@@ -1,0 +1,152 @@
+---
+title: "The Economic Consequences of Saddam Hussein: A Synthetic Control Approach"
+author: "Sali Mahdy"
+date: '2022-03-16'
+output: html_document
+---
+
+```{r setup, include=FALSE, results= 'hide'}
+knitr::opts_chunk$set(message=FALSE, echo=FALSE, warning=FALSE)
+```
+
+```{r}
+library(tidysynth)
+library(Synth)
+library(readxl)
+library(readr)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+```
+
+
+```{r}
+data<-read_csv('C:/Users/salim/Documents/Thesis/final_data.csv')
+```
+
+```{r}
+data_out <-
+  
+  data %>%
+  
+  # initial the synthetic control object
+  synthetic_control(outcome = GDPperCapita, # outcome
+                    unit = Country, # unit index in the panel data
+                    time = Year, # time index in the panel data
+                    i_unit = "Iraq", # unit where the intervention occurred
+                    i_time = 1979, # time period when the intervention occurred
+                    generate_placebos=TRUE # generate placebo synthetic controls 
+                    ) %>%
+  
+  # Generate the aggregate predictors used to fit the weights
+  
+  # average fertility rate, mortality rate, population growth, life expectancy from 1968 - 1979
+  generate_predictor(time_window = 1968:1979,
+                     fertility = mean(FertilityRate, na.rm = T),
+                     gdp = mean(GDPperCapita, na.rm = T),
+                     mortality = mean(MortalityRate, na.rm = T),
+                     population= mean(PopulationGrowth, na.rm=T),
+                     lifeexp= mean(LifeExpectancy, na.rm=T)) %>%
+  
+  # average civil liberties in the donor pool from 1972 - 1979
+  generate_predictor(time_window = 1972:1979,
+                     liberties = mean(CivilLiberties, na.rm = T))%>%
+
+  
+  
+  # Generate the fitted weights for the synthetic control
+  generate_weights(optimization_window = 1968:1979, # time to use in the optimization task
+                   margin_ipop = .02,sigf_ipop = 7,bound_ipop = 6 # optimizer options
+  ) %>%
+  
+  # Generate the synthetic control
+  generate_control()
+
+```
+
+```{r}
+#extract respective predictor matrices 
+data_out%>% grab_predictors(type='treated')
+data_out%>% grab_predictors(type='controls')
+```
+
+
+```{r}
+#retrieve weights
+data_out%>%grab_predictor_weights()
+data_out%>%grab_unit_weights()
+```
+
+```{r}
+#retrieve placebo weights
+data_out%>% grab_predictor_weights(placebo = TRUE)
+data_out%>% grab_unit_weights(placebo=TRUE)
+```
+
+```{r}
+data_out%>%plot_trends()+
+  labs(y='GDP per Capita (current US$)')+ggtitle('Iraq vs. Synthetic Iraq')+
+  theme(plot.title = element_text(hjust = 0.5))+theme(
+  panel.border = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  axis.line = element_line(colour = "black")
+  )
+
+```
+
+
+```{r}
+data_out%>%plot_weights()
+```
+
+```{r}
+data_out%>% grab_balance_table()
+```
+
+```{r}
+data_out%>%plot_placebos()+
+  labs(y='GDP per Capita (current US$)')+
+  theme(
+  panel.border = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  axis.line = element_line(colour = "black"))
+  
+```
+
+```{r}
+data_out%>%plot_placebos(prune=FALSE)
+```
+
+```{r}
+data_out%>%plot_mspe_ratio()+
+  ggtitle('Ratio of Pre and Post MSPE')+
+  theme(
+  panel.border = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  axis.line = element_line(colour = "black"))+
+ theme( plot.title = element_text(hjust = 0.5))
+
+```
+
+```{r}
+data_out%>%grab_signficance()
+```
+
+```{r}
+data_out%>%grab_synthetic_control()
+
+```
+
+
+
+
+```{r}
+data1<-read_csv('C:/Users/salim/Documents/Thesis/data1.csv')
+head(data)
+```
+
+
+
