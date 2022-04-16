@@ -21,7 +21,7 @@ library(ggplot2)
 
 
 ```{r}
-data<-read_csv('C:/Users/salim/Documents/Thesis/final_data.csv')
+data<-read_csv('C:/Users/salim/Documents/GitHub/Economic-Consequences-of-Saddam-Hussein-/R Code/synth_data.csv')
 ```
 
 ```{r}
@@ -29,7 +29,7 @@ data_out <-
   
   data %>%
   
-  # initial the synthetic control object
+  # initialize the synthetic control object
   synthetic_control(outcome = GDPperCapita, # outcome
                     unit = Country, # unit index in the panel data
                     time = Year, # time index in the panel data
@@ -72,10 +72,12 @@ data_out%>% grab_predictors(type='controls')
 
 
 ```{r}
-#retrieve weights
+#retrieve predictor weights
 data_out%>%grab_predictor_weights()
 data_out%>%grab_unit_weights()
 ```
+
+
 
 ```{r}
 #retrieve placebo weights
@@ -85,41 +87,63 @@ data_out%>% grab_unit_weights(placebo=TRUE)
 
 ```{r}
 data_out%>%plot_trends()+
-  labs(y='GDP per Capita (current US$)')+ggtitle('Iraq vs. Synthetic Iraq')+
+  labs(y='GDP per Capita (current US$)', x=" ")+ggtitle('Iraq vs. Synthetic Iraq')+
   theme(plot.title = element_text(hjust = 0.5))+theme(
   panel.border = element_blank(),
   panel.grid.major = element_blank(),
   panel.grid.minor = element_blank(),
   axis.line = element_line(colour = "black")
-  )
+  )+
+  scale_color_manual(values=met.brewer("Cross", n=2, type='continuous'))+
+  annotate('text', x=1973.8, y=7500, label='Saddam Hussein Takes Power', size=3)
 
 ```
 
 
-```{r}
-data_out%>%plot_weights()
-```
-
-```{r}
-data_out%>% grab_balance_table()
-```
-
-```{r}
-data_out%>%plot_placebos()+
-  labs(y='GDP per Capita (current US$)')+
-  theme(
-  panel.border = element_blank(),
-  panel.grid.major = element_blank(),
-  panel.grid.minor = element_blank(),
-  axis.line = element_line(colour = "black"))
+```{r} 
+#visualize control and variable weights
+data_out%>%plot_weights()+
+   scale_fill_manual(values=met.brewer("Cross", n=2, type='continuous'))+
   
 ```
 
 ```{r}
-data_out%>%plot_placebos(prune=FALSE)
+#retrieve predictor means
+data_out%>% grab_balance_table()
+```
+
+```{r} 
+#visualize placebo (pruned)
+data_out%>%plot_placebos()+
+  labs(y='GDP per Capita (current US$)', title='Difference of each Country in the Donor Pool')+
+  theme(
+  panel.border = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  axis.line = element_line(colour = "black"), plot.title = element_text(hjust = 0.5))+
+    scale_color_manual(values=met.brewer("Cross", n=2, type='continuous'))+
+  labs(y='GDP per Capita (current US$)', x=" ")+
+  annotate('text', x=1973.8, y=4000, label='Saddam Hussein Takes Power', size=3)
+  
+  
 ```
 
 ```{r}
+#visualize placebo 
+data_out%>%plot_placebos(prune=FALSE)+
+    scale_color_manual(values=met.brewer("Cross", n=2, type='continuous'))+
+  labs(y='GDP per Capita (current US$)', x=" ", title='Difference of each Country in the Donor Pool' )+
+  annotate('text', x=1973.8, y=-15000, label='Saddam Hussein Takes Power', size=3)+  theme(plot.title = element_text(hjust = 0.5))+
+  theme(
+  panel.border = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  axis.line = element_line(colour = "black")
+  )
+```
+
+```{r}
+#visualize MSPE ratio
 data_out%>%plot_mspe_ratio()+
   ggtitle('Ratio of Pre and Post MSPE')+
   theme(
@@ -127,26 +151,23 @@ data_out%>%plot_mspe_ratio()+
   panel.grid.major = element_blank(),
   panel.grid.minor = element_blank(),
   axis.line = element_line(colour = "black"))+
- theme( plot.title = element_text(hjust = 0.5))
-
+ theme( plot.title = element_text(hjust = 0.5))+
+    scale_fill_manual(values=met.brewer("Cross", n=2, type='continuous'))
 ```
 
 ```{r}
+#generate statistical significance 
 data_out%>%grab_signficance()
 ```
 
 ```{r}
+#generate information comparing the real and synthetic GDP per capita 
 data_out%>%grab_synthetic_control()
 
 ```
 
 
 
-
-```{r}
-data1<-read_csv('C:/Users/salim/Documents/Thesis/data1.csv')
-head(data)
-```
 
 
 

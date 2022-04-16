@@ -1,0 +1,172 @@
+---
+title: "ThesisVisualizations"
+author: "Sali Mahdy"
+date: '2022-04-10'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+library(tidysynth)
+library(Synth)
+library(readxl)
+library(readr)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(ggalt)
+library(wesanderson)
+library(MetBrewer)
+library(CGPfunctions)
+library(gridExtra)
+library(cowplot)
+```
+
+
+
+```{r}
+data<-read_csv('C:/Users/salim/Documents/GitHub/Economic-Consequences-of-Saddam-Hussein-/R Code/gulf_data.csv')
+synth_gdp<-read_csv('C:/Users/salim/Documents/GitHub/Economic-Consequences-of-Saddam-Hussein-/R Code/synth_gdp.csv')
+```
+
+
+```{r}
+#visualizing GDP per capita for Iraq and neighboring oil rich countries 
+ggplot(data, aes(x=Year, y=GDPperCapita, group=Country, color=Country))+
+  geom_line(size=1)+
+  labs(x="", y="", title="GDP per Capita (Current US$)")+
+    theme(axis.line = element_line(colour = "black"),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank())+
+  scale_color_manual(values=met.brewer("OKeeffe1", n=6, type='continuous'))
+
+
+```
+
+```{r}
+#visualizing GDP per Capita for Synthetic Iraq and neighboring countries
+ggplot(synth_gdp, aes(x=Year, y=GDPperCapita, group=Country, color=Country))+
+  geom_line(size=1)+
+  labs(x="", y="", title="GDP per Capita (Current US$)")+
+    theme(axis.line = element_line(colour = "black"),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank())+
+  scale_color_manual(values=met.brewer("OKeeffe1", n=8, type='continuous'))
+```
+
+
+
+
+```{r}
+#visualizing changes in life expectancy for Iraq and neighboring countries
+le<- filter(data, Year %in% c(1968, 2003))%>%
+  select(Country, Year, LifeExpectancy)
+ 
+
+plotdata_widele<-spread(le, Year, LifeExpectancy)
+
+names(plotdata_widele)<-c('Country', 'y1968', 'y2003')
+
+ggplot(plotdata_widele, 
+       aes(y = reorder(Country, y1968),
+           x = y1968,
+           xend = y2003)) +  
+  geom_dumbbell(size = 1.2,
+                size_x = 3, 
+                size_xend = 3,
+                colour = "#a3c4dc", 
+                colour_xend = "#0e668b", 
+                dot_guide_size = 0.15,
+                dot_guide_colour = "grey60") +
+  theme_minimal() + 
+  labs(title = "Change in Life Expectancy, 1968-2003",
+       x = "Life Expectancy (Years)",
+       y = "")
+
+
+```
+
+```{r}
+#visualizing changes in mortality rates for Iraq and neighboring countries 
+mr<- filter(data, Year %in% c(1968, 2003))%>%
+  select(Country, Year, MortalityRate)
+ 
+
+plotdata_widemr<-spread(mr, Year, MortalityRate)
+
+names(plotdata_widemr)<-c('Country', 'y1968', 'y2003')
+
+ggplot(plotdata_widemr, 
+       aes(y = reorder(Country, y1968),
+           x = y1968,
+           xend = y2003)) +  
+  geom_dumbbell(size = 1.2,
+                size_x = 3, 
+                size_xend = 3,
+                colour = "#a3c4dc", 
+                colour_xend = "#0e668b", 
+                dot_guide_size = 0.15,
+                dot_guide_colour = "grey60") +
+  theme_minimal() + 
+  labs(title = "Change in Mortality Rate, 1968-2003",
+       x = "Mortality Rate, infant (per 1,000 live births)",
+       y = "")+
+  scale_x_reverse()
+```
+
+```{r}
+#visualizing changes in fertility rate for Iraq and neighboring countries 
+fr<- filter(data, Year %in% c(1968, 2003))%>%
+  select(Country, Year, FertilityRate)
+ 
+
+plotdata_widefr<-spread(fr, Year, FertilityRate)
+
+names(plotdata_widefr)<-c('Country', 'y1968', 'y2003')
+
+ggplot(plotdata_widefr, 
+       aes(y = reorder(Country, y1968),
+           x = y1968,
+           xend = y2003)) +  
+  geom_dumbbell(size = 1.2,
+                size_x = 3, 
+                size_xend = 3,
+                colour = "#a3c4dc", 
+                colour_xend = "#0e668b", 
+                dot_guide_size = 0.15,
+                dot_guide_colour = "grey60") +
+  theme_minimal() + 
+  labs(title = "Change in Fertility Rate, 1968-2003",
+       x = "Ferility Rate, total (births per woman)",
+       y = "")+
+  scale_x_reverse()
+```
+
+
+```{r}
+#visualizing changes in population growth for Iraq and neighboring countries 
+p<- data%>%
+  filter(Year %in% c(1968, 1978, 1988, 1998, 2003))%>%
+  select(Country, Year, PopulationGrowth)%>%
+  mutate(Year=factor(Year))
+
+newggslopegraph(p, Year, PopulationGrowth, Country, ThemeChoice='tufte', Title='Population Growth (annual %), 1968-2003', SubTitle=NULL, Caption=NULL)
+```
+
+
+
+
+
+
+
+
+
