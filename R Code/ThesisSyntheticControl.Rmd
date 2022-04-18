@@ -17,6 +17,7 @@ library(readr)
 library(tidyverse)
 library(dplyr)
 library(ggplot2)
+library(MetBrewer)
 ```
 
 
@@ -42,15 +43,15 @@ data_out <-
   
   # average fertility rate, mortality rate, population growth, life expectancy from 1968 - 1979
   generate_predictor(time_window = 1968:1979,
-                     fertility = mean(FertilityRate, na.rm = T),
-                     gdp = mean(GDPperCapita, na.rm = T),
-                     mortality = mean(MortalityRate, na.rm = T),
-                     population= mean(PopulationGrowth, na.rm=T),
-                     lifeexp= mean(LifeExpectancy, na.rm=T)) %>%
+                     'Fertility Rate' = mean(FertilityRate, na.rm = T),
+                     'GDP per Capita' = mean(GDPperCapita, na.rm = T),
+                     'Mortality Rate' = mean(MortalityRate, na.rm = T),
+                     'Population Growth' = mean(PopulationGrowth, na.rm=T),
+                     'Life Expectancy' = mean(LifeExpectancy, na.rm=T)) %>%
   
   # average civil liberties in the donor pool from 1972 - 1979
   generate_predictor(time_window = 1972:1979,
-                     liberties = mean(CivilLiberties, na.rm = T))%>%
+                     'Civil Liberties' = mean(CivilLiberties, na.rm = T))%>%
 
   
   
@@ -103,7 +104,7 @@ data_out%>%plot_trends()+
 ```{r} 
 #visualize control and variable weights
 data_out%>%plot_weights()+
-   scale_fill_manual(values=met.brewer("Cross", n=2, type='continuous'))+
+   scale_fill_manual(values=met.brewer("Cross", n=2, type='continuous'))
   
 ```
 
