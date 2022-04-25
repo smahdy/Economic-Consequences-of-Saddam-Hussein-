@@ -115,7 +115,8 @@ data_out%>% grab_balance_table()
 
 ```{r} 
 #visualize placebo (pruned)
-data_out%>%plot_placebos()+
+data_out%>%
+  plot_placebos()+
   labs(y='GDP per Capita (current US$)', title='Difference of each Country in the Donor Pool')+
   theme(
   panel.border = element_blank(),
@@ -131,10 +132,10 @@ data_out%>%plot_placebos()+
 
 ```{r}
 #visualize placebo 
-data_out%>%plot_placebos(prune=FALSE)+
+data_out%>%plot_placebos(prune=FALSE, time_window = 1968:2)+
     scale_color_manual(values=met.brewer("Cross", n=2, type='continuous'))+
   labs(y='GDP per Capita (current US$)', x=" ", title='Difference of each Country in the Donor Pool' )+
-  annotate('text', x=1973.8, y=-15000, label='Saddam Hussein Takes Power', size=3)+  theme(plot.title = element_text(hjust = 0.5))+
+  annotate('text', x=1974.3, y=-15000, label='Saddam Hussein Takes Power', size=3)+  theme(plot.title = element_text(hjust = 0.5))+
   theme(
   panel.border = element_blank(),
   panel.grid.major = element_blank(),
